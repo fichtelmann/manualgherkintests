@@ -1,8 +1,11 @@
 package de.fichtelmannsoftware.manualgherkintests.parser
 
+import de.fichtelmannsoftware.manualgherkintests.poko.ManualTest
+import de.fichtelmannsoftware.manualgherkintests.poko.ManualTestCase
 import java.io.File
 
 class TestParser(path: File) {
+    var manualTest = ManualTest()
 
     enum class TestStepType {
         Feature,
@@ -20,16 +23,49 @@ class TestParser(path: File) {
     }
 
     private fun parseFeatureFile(featureFile: File) {
+        val testCases = mutableListOf<ManualTestCase>()
+        var actualTestCase = ManualTestCase()
+
         featureFile.forEachLine {
             when (identifyType(it)) {
-                TestStepType.Feature -> println("Feature: $it")
-                TestStepType.Description -> println("Description: $it")
-                TestStepType.Preparation -> println("Prepare: $it")
-                TestStepType.Action -> println("Please do: $it")
-                TestStepType.Expected -> println("Expect: $it")
+                TestStepType.Feature -> actualTestCase.feature += prepareString(it, TestStepType.Feature)
+                TestStepType.Description -> actualTestCase.description += prepareString(it, TestStepType.Description)
+                TestStepType.Preparation -> actualTestCase.preparation += prepareString(it, TestStepType.Preparation)
+                TestStepType.Action -> actualTestCase.actions += prepareString(it, TestStepType.Action)
+                TestStepType.Expected -> actualTestCase.expectedResult += prepareString(it, TestStepType.Expected)
                 else -> println(it)
             }
         }
+        println(actualTestCase.feature)
+        println(actualTestCase.actions)
+    }
+
+    /**
+     * Trim the string search for the particular keyword and reduce the beginning of the string.
+     * If a colon is near the keyword it will be removed also.
+     */
+    private fun prepareString(actualLine: String, testStepType: TestStepType): String {
+        var newLine = actualLine.trim()
+        var position = when (testStepType) {
+            TestStepType.Feature -> STRING_FEATURE.length
+            TestStepType.Description -> STRING_SCENARIO.length
+            TestStepType.Preparation -> STRING_WHEN.length
+            TestStepType.Action -> STRING_GIVEN.length
+            TestStepType.Expected -> STRING_THEN.length
+            else -> INVALID_POSITION
+        }
+
+        if (position != INVALID_POSITION) {
+            val indexColon = actualLine.indexOf(":")
+            if (indexColon != INVALID_POSITION && (indexColon == position + 1)) {
+                //TODO identify colon correctly
+                position = indexColon
+            } else {
+                position
+            }
+            newLine = newLine.subSequence(position++, newLine.length).toString()
+        }
+        return newLine.trim()
     }
 
     /**
@@ -53,5 +89,6 @@ class TestParser(path: File) {
         const val STRING_GIVEN = "Given"
         const val STRING_WHEN = "When"
         const val STRING_THEN = "Then"
+        const val INVALID_POSITION = -1
     }
 }
