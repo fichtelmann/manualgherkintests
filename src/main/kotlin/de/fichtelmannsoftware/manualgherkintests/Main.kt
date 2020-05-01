@@ -5,7 +5,7 @@ import java.io.File
 import java.io.FileNotFoundException
 
 fun main(args: Array<String>) {
-    ManualTestConsole(args)
+    ManualTestConsole(args).start()
 }
 
 fun prepareFile(filePath: String): File {
