@@ -1,6 +1,7 @@
 package de.fichtelmannsoftware.manualgherkintests.poko
 
-class ManualTest {
+
+data class ManualTest(var feature: String, var description: String = "") {
     val testCases = mutableListOf<ManualTestCase>()
 
 }

@@ -1,6 +1,7 @@
 package de.fichtelmannsoftware.manualgherkintests.parser
 
 import de.fichtelmannsoftware.manualgherkintests.poko.ManualTest
+import de.fichtelmannsoftware.manualgherkintests.poko.ManualTestCase
 import io.cucumber.gherkin.Gherkin
 import io.cucumber.messages.IdGenerator
 import io.cucumber.messages.Messages
@@ -11,7 +12,6 @@ import java.util.stream.Collectors
 
 class TestParser(path: File) {
     val idGenerator = IdGenerator.Incrementing()
-    var manualTest = ManualTest()
 
     enum class TestStepType {
         Feature,
@@ -43,11 +43,20 @@ class TestParser(path: File) {
 
         // Get the Feature node of the AST
         val feature = gherkinDocument.feature
-        println("Feature: $feature")
+        //println("Feature: $feature")
+        val manualTest: ManualTest = convertFeatureToManualTest(feature)
+        println(manualTest)
+        println(manualTest.testCases)
+    }
 
-        // Get the first Scenario node of the Feature node
-        val scenario = feature.getChildren(0).scenario
-        println("Scenario: $scenario")
+    private fun convertFeatureToManualTest(feature: GherkinDocument.Feature?): ManualTest {
+        val manualTest = ManualTest(feature!!.name, feature.description)
+        for (i in 0..feature.childrenCount - 1) {
+            val scenario = feature.getChildren(i).scenario
+            val testCase = ManualTestCase(scenario.name)
+            manualTest.testCases.add(testCase)
+        }
+        return manualTest
     }
 
     companion object {
