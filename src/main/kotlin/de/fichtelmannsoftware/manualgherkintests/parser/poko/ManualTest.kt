@@ -1,4 +1,4 @@
-package de.fichtelmannsoftware.manualgherkintests.poko
+package de.fichtelmannsoftware.manualgherkintests.parser.poko
 
 
 data class ManualTest(var feature: String, var description: String = "") {

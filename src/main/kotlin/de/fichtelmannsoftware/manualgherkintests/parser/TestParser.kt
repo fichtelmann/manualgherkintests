@@ -1,7 +1,7 @@
 package de.fichtelmannsoftware.manualgherkintests.parser
 
-import de.fichtelmannsoftware.manualgherkintests.poko.ManualTest
-import de.fichtelmannsoftware.manualgherkintests.poko.ManualTestCase
+import de.fichtelmannsoftware.manualgherkintests.parser.poko.ManualTest
+import de.fichtelmannsoftware.manualgherkintests.parser.poko.ManualTestCase
 import io.cucumber.gherkin.Gherkin
 import io.cucumber.messages.IdGenerator
 import io.cucumber.messages.Messages
@@ -11,24 +11,22 @@ import java.util.stream.Collectors
 
 
 class TestParser(path: File) {
-    val idGenerator = IdGenerator.Incrementing()
-
-    enum class TestStepType {
-        Feature,
-        Description,
-        Preparation,
-        Action,
-        Expected,
-        Unknown
-    }
+    val manualTests = mutableListOf<ManualTest>()
+    private val idGenerator = IdGenerator.Incrementing()
 
     init {
         if (path.isFile) {
-            parseFeatureFile(path)
+            manualTests.add(parseFeatureFile(path))
         }
     }
 
-    private fun parseFeatureFile(featureFile: File) {
+    /**
+     * Use Gherkin to parse the feature file and
+     * @return a ManualTest object.
+     *
+     * HowTo: https://github.com/cucumber/gherkin-java/blob/master/src/test/java/io/cucumber/gherkin/GherkinTest.java
+     */
+    private fun parseFeatureFile(featureFile: File): ManualTest {
         val paths = listOf(featureFile.absolutePath)
         val includeSource = false
         val includeAst = true
@@ -43,28 +41,36 @@ class TestParser(path: File) {
 
         // Get the Feature node of the AST
         val feature = gherkinDocument.feature
-        //println("Feature: $feature")
         val manualTest: ManualTest = convertFeatureToManualTest(feature)
-        println(manualTest)
-        println(manualTest.testCases)
+
+        return manualTest
     }
 
+    /**
+     * Use the Feature object from Gherkin to parse all Szenarios and
+     * @return a ManualTest object.
+     */
     private fun convertFeatureToManualTest(feature: GherkinDocument.Feature?): ManualTest {
         val manualTest = ManualTest(feature!!.name, feature.description)
         for (i in 0..feature.childrenCount - 1) {
             val scenario = feature.getChildren(i).scenario
             val testCase = ManualTestCase(scenario.name)
+            scenario.stepsList.forEach {
+                when (it.keyword.trim()) {
+                    STRING_KEYWORD_GIVEN -> testCase.preparation += it.text
+                    STRING_KEYWORD_WHEN -> testCase.actions += it.text
+                    STRING_KEYWORD_THEN -> testCase.expectedResult += it.text
+                    else -> error("${it.keyword} is not supported.")
+                }
+            }
             manualTest.testCases.add(testCase)
         }
         return manualTest
     }
 
     companion object {
-        const val STRING_FEATURE = "Feature"
-        const val STRING_SCENARIO = "Scenario"
-        const val STRING_GIVEN = "Given"
-        const val STRING_WHEN = "When"
-        const val STRING_THEN = "Then"
-        const val INVALID_POSITION = -1
+        const val STRING_KEYWORD_WHEN = "When"
+        const val STRING_KEYWORD_THEN = "Then"
+        const val STRING_KEYWORD_GIVEN = "Given"
     }
 }

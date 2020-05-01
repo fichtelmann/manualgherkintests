@@ -1,4 +1,4 @@
-package de.fichtelmannsoftware.manualgherkintests.poko
+package de.fichtelmannsoftware.manualgherkintests.parser.poko
 
 data class ManualTestCase(var description: String) {
     var preparation = ""
