@@ -57,13 +57,10 @@ class TestParser(path: File) {
 
         if (position != INVALID_POSITION) {
             val indexColon = actualLine.indexOf(":")
-            if (indexColon != INVALID_POSITION && (indexColon == position + 1)) {
-                //TODO identify colon correctly
-                position = indexColon
-            } else {
-                position
+            if (indexColon != INVALID_POSITION && (indexColon == position || indexColon == position + 1)) {
+                position = indexColon + 1
             }
-            newLine = newLine.subSequence(position++, newLine.length).toString()
+            newLine = newLine.subSequence(position, newLine.length).toString()
         }
         return newLine.trim()
     }
