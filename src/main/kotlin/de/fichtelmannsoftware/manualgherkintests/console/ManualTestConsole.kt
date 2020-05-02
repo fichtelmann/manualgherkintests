@@ -58,7 +58,7 @@ class ManualTestConsole(args: Array<String>) {
         println(prefix + manualTestCase.description)
         println("$preparePrefix${manualTestCase.preparation}")
         println("$actionPrefix${manualTestCase.actions}")
-        println("$expectedPrefix")
+        println(expectedPrefix)
         println("${ANSI_PURPLE}Expected result: ${ANSI_WHITE}${manualTestCase.expectedResult}")
         println("${ANSI_PURPLE}Please enter actual result: ${ANSI_WHITE}")
         manualTestCase.documentation = readLine().toString()
@@ -102,6 +102,31 @@ class ManualTestConsole(args: Array<String>) {
                                |$prefix####### FAIL #######
                                |$prefix####################$ANSI_WHITE
             """.trimMargin())
+        }
+    }
+
+    /**
+     * Print out a report for Manual tests.
+     */
+    fun printReport(testlist: List<ManualTest> = this.tests) {
+        println("""$ANSI_PURPLE##################################
+                              |############# REPORT #############
+                              |##################################""".trimMargin())
+        var featureCount = 0
+        testlist.forEach {
+            var testCount = 0
+            println("$ANSI_PURPLE\n#############\tFeature ${++featureCount}/${testlist.size}\t#############")
+            println("${it.feature}\n${it.description}")
+            it.testCases.forEach(Consumer { testcase ->
+                println("$ANSI_PURPLE\t\n#############\tTest ${++testCount}/${it.testCases.size}\t#############")
+                println("\tDescription: ${testcase.description}")
+                println("\tPreparation: ${testcase.preparation}")
+                println("\tActions: ${testcase.actions}")
+                println("\tActual result: ${testcase.documentation}")
+                println("\tExpected result: ${testcase.expectedResult}")
+                printResult(testcase.result, "\t")
+            })
+            println("$ANSI_PURPLE\n#########\tFeature ${featureCount}/${testlist.size} tested\t##########")
         }
     }
 

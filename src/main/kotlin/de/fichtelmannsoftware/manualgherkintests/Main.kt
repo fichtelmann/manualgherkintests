@@ -5,7 +5,9 @@ import java.io.File
 import java.io.FileNotFoundException
 
 fun main(args: Array<String>) {
-    ManualTestConsole(args).start()
+    val manualTestConsole = ManualTestConsole(args)
+    manualTestConsole.start()
+    manualTestConsole.printReport()
 }
 
 fun prepareFile(filePath: String): File {
