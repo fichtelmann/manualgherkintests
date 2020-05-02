@@ -17,6 +17,7 @@ dependencies {
 
     testCompile "org.junit.jupiter:junit-jupiter-api:$junit_version"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+    testCompile group: 'io.cucumber', name: 'cucumber-java8', version: '5.6.0'
 
     // https://mvnrepository.com/artifact/io.cucumber/gherkin
     compile group: 'io.cucumber', name: 'gherkin', version: '13.0.0'
