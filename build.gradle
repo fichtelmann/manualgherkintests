@@ -21,7 +21,10 @@ dependencies {
 
     // https://mvnrepository.com/artifact/io.cucumber/gherkin
     compile group: 'io.cucumber', name: 'gherkin', version: '13.0.0'
+}
 
+test {
+    useJUnitPlatform()
 }
 
 compileKotlin {

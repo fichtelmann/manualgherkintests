@@ -7,6 +7,7 @@ import io.cucumber.messages.IdGenerator
 import io.cucumber.messages.Messages
 import io.cucumber.messages.Messages.GherkinDocument
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.stream.Collectors
 
 
@@ -15,11 +16,15 @@ class TestParser(path: File) {
     private val idGenerator = IdGenerator.Incrementing()
 
     init {
-        if (path.isFile) {
-            manualTests.add(parseFeatureFile(path))
-        } else if (path.isDirectory) {
-            val featureFiles = path.listFiles()!!.filter { it.extension == "feature" }
-            featureFiles.forEach { manualTests.add(parseFeatureFile(it)) }
+        if (path.exists()) {
+            if (path.isFile) {
+                manualTests.add(parseFeatureFile(path))
+            } else if (path.isDirectory) {
+                val featureFiles = path.listFiles()!!.filter { it.extension == "feature" }
+                featureFiles.forEach { manualTests.add(parseFeatureFile(it)) }
+            }
+        } else {
+            throw FileNotFoundException("The given file/directory '$path' does not exists.")
         }
     }
 
