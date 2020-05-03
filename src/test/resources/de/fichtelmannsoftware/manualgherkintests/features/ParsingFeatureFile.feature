@@ -15,6 +15,6 @@ Feature: Parse a feature file to a ManualTest object
     And This ManualTest object has 3 tests
 
   Scenario: Giving a folder to the TestParser will create one ManualTest per feature file
-    Given The folder 'threeFeatures/' contain three feature files
+    Given The folder 'threeFeatures/' contain 3 feature files
     When Creating a TestParser object from file 'threeFeatures/'
-    Then TestParser object contains 1 manual test
+    Then TestParser object contains 3 manual test

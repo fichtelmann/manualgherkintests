@@ -29,8 +29,16 @@ class ParsingFeatureFile : En {
             assertEquals(testCount, actualTestParser.manualTests[0].testCases.size)
         }
 
-        Given("The folder {string} contain three feature files") { filepath: String? ->
-            //Not implemented
+        Given("The folder {string} contain {int} feature files") { filepath: String?, fileCount: Int? ->
+            if (filepath != null) {
+                val file = File(ParsingFeatureFile::class.java.getResource(filepath).path)
+                assertTrue(file.exists())
+                assertTrue(file.isDirectory)
+                val featureFiles = file.listFiles()!!.filter { it.extension == "feature" }
+                assertEquals(fileCount, featureFiles.size)
+            } else {
+                fail("File/Folder not found: $filepath")
+            }
         }
     }
 }
