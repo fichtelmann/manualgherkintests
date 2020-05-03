@@ -17,6 +17,9 @@ class TestParser(path: File) {
     init {
         if (path.isFile) {
             manualTests.add(parseFeatureFile(path))
+        } else if (path.isDirectory) {
+            val featureFiles = path.listFiles()!!.filter { it.extension == "feature" }
+            featureFiles.forEach { manualTests.add(parseFeatureFile(it)) }
         }
     }
 
