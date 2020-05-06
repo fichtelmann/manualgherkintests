@@ -18,14 +18,17 @@
 package de.fichtelmannsoftware.manualgherkintests.parser
 
 import io.cucumber.java8.En
-import io.cucumber.java8.PendingException
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import java.io.File
 
 class SupportTags : En {
+    companion object {
+        lateinit var actualParser: TestParser
+    }
+
     init {
         Given("Inside the folder: {string} only {int} feature file\\(s) have the tag {string}") { featureFolder: String, amountOfFilesWithTag: Int, tagName: String ->
+
             val directory = File(ParsingFeatureFile::class.java.getResource(featureFolder).path)
             var tagCounter = 0
             assertTrue(directory.exists())
@@ -37,12 +40,16 @@ class SupportTags : En {
             assertEquals(amountOfFilesWithTag, tagCounter)
         }
 
-        When("the user starts the Parser with the directory of feature files: {string}") { path: String? ->
-            throw PendingException()
+        When("the user starts the Parser with the directory of feature files: {string} and the tag {string}") { path: String, tagName: String ->
+
+            val directory = File(SupportTags::class.java.getResource(path).path)
+            actualParser = TestParser(directory, tagName)
+            assertNotNull(actualParser)
         }
 
         Then("only the feature {string} should be parsed") { featureName: String? ->
-            throw PendingException()
+            assertEquals(1, actualParser.manualTests.size)
+            assertEquals(featureName, actualParser.manualTests[0].feature)
         }
     }
 }
