@@ -6,6 +6,6 @@ Feature: The software should support tags inside the feature files
 
   Scenario: Inside a folder of feature files one file is marked with a the tag 'manual' and the others not. The Parser
   shall only parse these files with the tag.
-    Given One feature file have the tag '@manual'
+    Given Inside the folder: 'oneFeatureFileIsTagged/' only 1 feature file(s) have the tag '@manual'
     When the user starts the Parser with the directory of feature files: 'oneFeatureFileIsTagged/'
     Then only the feature 'This is the second feature' should be parsed
