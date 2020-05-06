@@ -74,4 +74,33 @@ internal class TestParserTest {
             assertTrue(expectedFeatureNames.contains(it))
         }
     }
+
+    @Test
+    @DisplayName("Test the constructor if the second parameter for tags is given")
+    internal fun constructor_SecondParameter() {
+        val testDirectory = File(TestParserTest::class.java.getResource("oneFeatureFileIsTagged/").path)
+        val expectedAmoutOfTestedFeatures = 1
+        val expectedFeatureName = "This is the second feature"
+        val tagName = "@manual"
+
+        val parser = TestParser(testDirectory, tagName)
+
+        assertTrue(testDirectory.exists())
+        assertEquals(expectedAmoutOfTestedFeatures, parser.manualTests.size)
+        assertEquals(expectedFeatureName, parser.manualTests[0].feature)
+    }
+
+    @Test
+    @DisplayName("NegativeTest the constructor if the second parameter for tags is NOT given")
+    internal fun constructor_SecondParameter_negative() {
+        val testDirectory = File(TestParserTest::class.java.getResource("oneFeatureFileIsTagged/").path)
+        val expectedAmoutOfTestedFeatures = 3
+        val expectedNameThirdFeature = "This is the third feature"
+
+        val parser = TestParser(testDirectory)
+
+        assertTrue(testDirectory.exists())
+        assertEquals(expectedAmoutOfTestedFeatures, parser.manualTests.size)
+        assertEquals(expectedNameThirdFeature, parser.manualTests[0].feature)
+    }
 }

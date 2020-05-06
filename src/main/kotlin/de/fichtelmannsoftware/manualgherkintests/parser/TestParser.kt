@@ -28,17 +28,18 @@ import java.io.FileNotFoundException
 import java.util.stream.Collectors
 
 
-class TestParser(path: File) {
+class TestParser(path: File, val tag: String = "") {
+
     val manualTests = mutableListOf<ManualTest>()
     private val idGenerator = IdGenerator.Incrementing()
 
     init {
         if (path.exists()) {
             if (path.isFile) {
-                manualTests.add(parseFeatureFile(path))
+                addManualTest(parseFeatureFile(path))
             } else if (path.isDirectory) {
                 val featureFiles = path.listFiles()!!.filter { it.extension == "feature" }
-                featureFiles.forEach { manualTests.add(parseFeatureFile(it)) }
+                featureFiles.forEach { addManualTest(parseFeatureFile(it)) }
             }
         } else {
             throw FileNotFoundException("The given file/directory '$path' does not exists.")
@@ -46,12 +47,23 @@ class TestParser(path: File) {
     }
 
     /**
+     * Simply checks the given ManualTest and adds it if its not null.
+     * @return <code>true</code> if the test was added successfully to the list otherwise <code>false</code>
+     */
+    private fun addManualTest(test: ManualTest?): Boolean {
+        if (test == null) {
+            return false
+        }
+        return manualTests.add(test)
+    }
+
+    /**
      * Use Gherkin to parse the feature file and
-     * @return a ManualTest object.
+     * @return a ManualTest object. If the object is not valid the method returns <code>null</code>
      *
      * HowTo: https://github.com/cucumber/gherkin-java/blob/master/src/test/java/io/cucumber/gherkin/GherkinTest.java
      */
-    private fun parseFeatureFile(featureFile: File): ManualTest {
+    private fun parseFeatureFile(featureFile: File): ManualTest? {
         val paths = listOf(featureFile.absolutePath)
         val includeSource = false
         val includeAst = true
@@ -65,8 +77,13 @@ class TestParser(path: File) {
         val gherkinDocument: GherkinDocument = envelopes[0].gherkinDocument
 
         // Get the Feature node of the AST
+        var manualTest: ManualTest? = null
         val feature = gherkinDocument.feature
-        val manualTest: ManualTest = convertFeatureToManualTest(feature)
+        if (tag.isNotEmpty()) {
+            if (feature.tagsList.isNotEmpty() && feature.tagsList.map { it.name }.contains(tag)) {
+                manualTest = convertFeatureToManualTest(feature)
+            }
+        } else manualTest = convertFeatureToManualTest(feature)
 
         return manualTest
     }
@@ -77,7 +94,7 @@ class TestParser(path: File) {
      */
     private fun convertFeatureToManualTest(feature: GherkinDocument.Feature?): ManualTest {
         val manualTest = ManualTest(feature!!.name, feature.description)
-        for (i in 0..feature.childrenCount - 1) {
+        for (i in 0 until feature.childrenCount) {
             val scenario = feature.getChildren(i).scenario
             val testCase = ManualTestCase(scenario.name)
             scenario.stepsList.forEach {
