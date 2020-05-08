@@ -14,5 +14,5 @@ Feature: The software should support tags inside the feature files
   shall only parse these particular Scenario as a manual Test.
     Given Inside the folder: 'oneScenarioIsTagged/' only 1 scenario file(s) have the tag '@manual'
     When the user starts the Parser with the directory of feature files: 'oneScenarioIsTagged/' and the tag '@manual'
-    Then only the feature 'This is the second feature' should be parsed
+    Then only the feature 'This is the third feature' should be parsed
     And only 1 test case with the description 'Tagged Scenario' should be available

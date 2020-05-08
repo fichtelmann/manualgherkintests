@@ -27,13 +27,13 @@ class SupportTags : En {
     }
 
     init {
-        Given("Inside the folder: {string} only {int} feature file\\(s) have the tag {string}") { featureFolder: String, amountOfFilesWithTag: Int, tagName: String ->
+        Given("Inside the folder: {string} only {int} (feature|scenario) file\\(s) have the tag {string}") { featureFolder: String, amountOfFilesWithTag: Int, tagName: String ->
 
             val directory = File(ParsingFeatureFile::class.java.getResource(featureFolder).path)
             var tagCounter = 0
             assertTrue(directory.exists())
-            directory.listFiles().filter { it.extension == "feature" }.forEach {
-                if (it.readText(Charsets.UTF_8).contains(tagName!!)) {
+            directory.listFiles()!!.filter { it.extension == "feature" }.forEach {
+                if (it.readText(Charsets.UTF_8).contains(tagName)) {
                     tagCounter++
                 }
             }
@@ -50,6 +50,14 @@ class SupportTags : En {
         Then("only the feature {string} should be parsed") { featureName: String? ->
             assertEquals(1, actualParser.manualTests.size)
             assertEquals(featureName, actualParser.manualTests[0].feature)
+        }
+
+        Then(
+            "only {int} test case with the description {string} should be available"
+        ) { amountOfTestcases: Int?, expectedDescription: String? ->
+
+            assertEquals(amountOfTestcases, actualParser.manualTests[0].testCases.size)
+            assertEquals(expectedDescription, actualParser.manualTests[0].testCases[0].description)
         }
     }
 }
